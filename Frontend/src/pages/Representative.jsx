@@ -86,7 +86,7 @@ function Representative({ isUpdate }) {
         setServerError(data.message || 'Failed to update.');
       } else {
         console.log('Update response:', data);
-        navigate("/representative/show-all");
+        navigate("/representative/show");
       }
     } catch (err) {
       console.error('Error updating:', err);

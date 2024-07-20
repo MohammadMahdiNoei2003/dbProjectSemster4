@@ -52,8 +52,8 @@ function Customers({ isUpdate }) {
           setState(data.state);
           setCity(data.city);
           setPostalCode(data.postal_code);
-          setPhoneNumber(data.phone_number);
-          setLineNumber(data.line_number);
+          setPhoneNumber(data.phone);
+          setLineNumber(data.line);
         })
         .catch((error) =>
           console.error('Error fetching customer data:', error)
@@ -82,8 +82,8 @@ function Customers({ isUpdate }) {
       state: state,
       city: city,
       postal_code: postalCode,
-      phone_number: phoneNumber,
-      line_number: lineNumber,
+      phone: phoneNumber,
+      line: lineNumber,
     };
     try {
       const response = await fetch('http://localhost:3000/customer', {
@@ -122,8 +122,8 @@ function Customers({ isUpdate }) {
       state: state,
       city: city,
       postal_code: postalCode,
-      phone_number: phoneNumber,
-      line_number: lineNumber,
+      phone: phoneNumber,
+      line: lineNumber,
     };
 
     try {
@@ -435,7 +435,7 @@ function Customers({ isUpdate }) {
         </label>
         <input
           type="text"
-          name="phone_number"
+          name="phone"
           value={phoneNumber}
           required
           onChange={(event) => setPhoneNumber(event.target.value)}
@@ -449,7 +449,7 @@ function Customers({ isUpdate }) {
         </label>
         <input
           type="text"
-          name="line_number"
+          name="line"
           value={lineNumber}
           required
           onChange={(event) => setLineNumber(event.target.value)}
