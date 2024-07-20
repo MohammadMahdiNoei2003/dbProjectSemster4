@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 function Contract({ isUpdate }) {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [serverError, setServerError] = useState('');
 
   const [subscriptionCode, setSubscriptionCode] = useState('');
   const [customerNumber, setCustomerNumber] = useState('');
@@ -16,10 +17,10 @@ function Contract({ isUpdate }) {
       fetch(`http://localhost:3000/contract/${id}`)
         .then(response => response.json())
         .then(data => {
-          setSubscriptionCode(data.subscription_code);
+          setSubscriptionCode(data.shuttle_subscription_code);
           setCustomerNumber(data.customer_number);
           setRepNumber(data.rep_number);
-          setReqType(data.req_type);
+          setReqType(data.request);
         })
         .catch(error => console.error('Error fetching contract data:', error));
     }
@@ -43,11 +44,19 @@ function Contract({ isUpdate }) {
         },
         body: JSON.stringify(values),
       });
-      const data = await response.json();
-      console.log('Registration response: ', data);
+      if (!response.ok) {
+        const data = await response.json();
+        console.error('Server error:', data);
+        setServerError(data.message || 'Failed to submit.');
+      } else {
+        const data = await response.json();
+        console.log('Registration response:', data);
+        navigate("/contract/show");
+      }
     } catch (err) {
-      console.error('Error registering: ', err);
-      return navigate('/500');
+      console.error('Error:', err);
+      setServerError('Internal server error.');
+      navigate('/500');
     }
   };
 
@@ -58,11 +67,11 @@ function Contract({ isUpdate }) {
       subscription_code: subscriptionCode,
       customer_number: customerNumber,
       rep_number: repNumber,
-      req_type: reqType
+      request: reqType
     };
 
     try {
-      const response = await fetch(`http://localhost:3000/contract/${id}`, {
+      const response = await fetch(`http://localhost:3000/contract/edit/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +79,13 @@ function Contract({ isUpdate }) {
         body: JSON.stringify(values),
       });
       const data = await response.json();
-      console.log('Update response: ', data);
+      if (!response.ok) {
+        console.error('Server error:', data);
+        setServerError(data.message || 'Failed to update.');
+      } else {
+        console.log('Update response:', data);
+        navigate("/contract/show");
+      }
     } catch (err) {
       console.error('Error updating: ', err);
       return navigate('/500');
@@ -147,6 +162,7 @@ function Contract({ isUpdate }) {
           onChange={(event) => setReqType(event.target.value)}
         />{' '}
         Transportation
+        {serverError && <div className="text-sm text-red-700">{serverError}</div>}
         <button
           type="submit"
           className="my-3 bg-[#483285] w-full rounded-md py-2 mt-8 text-center text-white hover:bg-[#342461] transition-all"

@@ -68,6 +68,7 @@ const createRep = async (repData, gender) => {
     client.release();
   }
 };
+
 const updateRep = async (id, repData, gender) => {
   const { first_name, last_name, repersenting_code } = repData;
 

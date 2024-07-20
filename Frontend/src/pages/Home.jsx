@@ -19,7 +19,7 @@ function Home() {
       <Grid container spacing={3} justifyContent="center">
         {cardsData.map((card, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>
-            <Link to={`/${card.title.toLowerCase()}/show-all`}>
+            <Link to={`/${card.title.toLowerCase()}/show`}>
               <Card
                 sx={{
                   minHeight: '80vh',

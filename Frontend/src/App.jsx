@@ -11,6 +11,7 @@ import P500 from './components/P500';
 import CustomerData from './components/CustomerData';
 import RepresentativeData from './components/RepresentativeData';
 import RepresentativeDetails from './components/RepresentativeDetails';
+import ContractData from './components/ContractData';
 
 function App() {
   return (
@@ -29,9 +30,10 @@ function App() {
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/register" element={<Register />} />
             <Route path='/500' element={<P500 />} />
-            <Route path='/customer/showa-all' element={<CustomerData />} />
-            <Route path='/representative/show-all' element={<RepresentativeData />} />
+            <Route path='/customer/show' element={<CustomerData />} />
+            <Route path='/representative/show' element={<RepresentativeData />} />
             <Route path='/representative/:id' element={<RepresentativeDetails />} />
+            <Route path='/contract/show' element={<ContractData />} />
           </Routes>
         </div>
       </div>
