@@ -1,7 +1,17 @@
 import { Link, useLocation } from 'react-router-dom';
 import { SidebarData } from './SidebarData';
+<<<<<<< Updated upstream
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import { Button } from '@mui/material';
+=======
+<<<<<<< HEAD
+import SearchIcon from '@mui/icons-material/Search';
+import { Button, InputBase } from '@mui/material';
+=======
+import ImportContactsIcon from '@mui/icons-material/ImportContacts';
+import { Button } from '@mui/material';
+>>>>>>> 1133efa (add auth middleware and tokenize frontend)
+>>>>>>> Stashed changes
 import LoginIcon from '@mui/icons-material/Login';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 

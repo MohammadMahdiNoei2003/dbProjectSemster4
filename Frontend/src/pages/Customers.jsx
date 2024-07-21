@@ -94,6 +94,22 @@ function Customers({ isUpdate }) {
       line: lineNumber,
     };
     try {
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+      const response = await fetch('http://localhost:3000/customer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        console.error('Server error:', data);
+        setServerError(data.message || 'Failed to submit.');
+=======
+>>>>>>> Stashed changes
       const token = localStorage.getItem('token');
       const response = await fetch(
         isUpdate
@@ -108,6 +124,26 @@ function Customers({ isUpdate }) {
           body: JSON.stringify(values),
         }
       );
+<<<<<<< Updated upstream
+=======
+
+      const data = await response.json();
+
+      if (response.ok) {
+        navigate(`/customer/show`);
+>>>>>>> 1133efa (add auth middleware and tokenize frontend)
+      } else {
+        const data = await response.json();
+        console.log('Registration response:', data);
+        navigate("/customer/show");
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      setServerError('Internal server error.');
+      navigate('/500');
+    }
+  };
+>>>>>>> Stashed changes
 
       const data = await response.json();
 

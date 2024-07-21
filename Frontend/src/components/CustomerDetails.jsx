@@ -38,6 +38,26 @@ function CustomerDetails() {
       }
     };
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+    if (loading) {
+        return (
+          <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+            <CircularProgress />
+          </Box>
+        );
+      }
+    
+      if (error) {
+        return (
+          <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+            <Typography color="error">{error}</Typography>
+          </Box>
+        );
+      }
+=======
+>>>>>>> Stashed changes
     fetchData();
   }, [id]);
 
@@ -66,6 +86,10 @@ function CustomerDetails() {
       </Box>
     );
   }
+<<<<<<< Updated upstream
+=======
+>>>>>>> 1133efa (add auth middleware and tokenize frontend)
+>>>>>>> Stashed changes
 
   return (
     <Box
