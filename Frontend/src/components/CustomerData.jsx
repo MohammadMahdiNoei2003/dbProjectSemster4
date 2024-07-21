@@ -68,6 +68,7 @@ function CustomerData() {
         alert('Customer deleted successfully');
         const updatedData = data.filter((item) => item.customer_number !== parseInt(id));
         setData(updatedData);
+        window.location.reload();
       } catch (err) {
         console.error('Error deleting:', err);
         alert('Failed to delete customer');

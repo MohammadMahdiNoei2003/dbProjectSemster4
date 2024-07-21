@@ -1,25 +1,25 @@
 const pool = require('../database/db');
 
 const findAllCustomers = async () => {
-  const result = await pool.query(`select * from linenumber l 
-    inner join customers c on l.customer_number = c.customer_number 
-    inner join phonenumber p on c.customer_number = p.customer_number 
-    inner join address a on c.address_id = a.address_id 
-    inner join city c2 on a.city_id = c2.city_id 
-    inner join state s on c2.state_id = s.state_id
-    inner join gender g on c.gender_id = g.gender_id`);
+  const result = await pool.query(`SELECT * FROM customers c
+    LEFT JOIN linenumber l ON c.customer_number = l.customer_number
+    LEFT JOIN phonenumber p ON c.customer_number = p.customer_number
+    LEFT JOIN address a ON c.address_id = a.address_id
+    LEFT JOIN city c2 ON a.city_id = c2.city_id
+    LEFT JOIN state s ON c2.state_id = s.state_id
+    LEFT JOIN gender g ON c.gender_id = g.gender_id`);
   return result.rows;
 };
 
 const findCustomerByID = async (id) => {
   const result = await pool.query(
-    `select * from linenumber l 
-    inner join customers c on l.customer_number = c.customer_number 
-    inner join phonenumber p on c.customer_number = p.customer_number 
-    inner join address a on c.address_id = a.address_id 
-    inner join city c2 on a.city_id = c2.city_id 
-    inner join state s on c2.state_id = s.state_id
-    inner join gender g on c.gender_id = g.gender_id where customer_number = $1`,
+    `SELECT * FROM customers c
+    LEFT JOIN linenumber l ON c.customer_number = l.customer_number
+    LEFT JOIN phonenumber p ON c.customer_number = p.customer_number
+    LEFT JOIN address a ON c.address_id = a.address_id
+    LEFT JOIN city c2 ON a.city_id = c2.city_id
+    LEFT JOIN state s ON c2.state_id = s.state_id
+    LEFT JOIN gender g ON c.gender_id = g.gender_id where customer_number = $1`,
     [id]
   );
   return result.rows[0];
@@ -55,6 +55,7 @@ const createCustomer = async (
   try {
     await client.query('BEGIN');
 
+    console.log('Inserting gender...');
     const genderResult = await client.query(
       'SELECT gender_id FROM Gender WHERE gender_title = $1',
       [gender]
@@ -70,6 +71,7 @@ const createCustomer = async (
       genderId = genderResult.rows[0].gender_id;
     }
 
+    console.log('Inserting state...');
     const stateResult = await client.query(
       'SELECT state_id FROM State WHERE state_name = $1',
       [state]
@@ -85,6 +87,7 @@ const createCustomer = async (
       stateId = stateResult.rows[0].state_id;
     }
 
+    console.log('Inserting city...');
     const cityResult = await client.query(
       'SELECT city_id FROM City WHERE city_name = $1 AND state_id = $2',
       [city, stateId]
@@ -100,6 +103,7 @@ const createCustomer = async (
       cityId = cityResult.rows[0].city_id;
     }
 
+    console.log('Inserting address...');
     const addressResult = await client.query(
       'SELECT address_id FROM Address WHERE postal_code = $1',
       [postalCode]
@@ -115,6 +119,7 @@ const createCustomer = async (
       addressId = addressResult.rows[0].address_id;
     }
 
+    console.log('Inserting customer...');
     const newCustomer = await client.query(
       `INSERT INTO customers (
         first_name, last_name, job_title, father_name, nationality, education_grade, national_number, presenter_number,
@@ -138,61 +143,34 @@ const createCustomer = async (
       ]
     );
 
-    const customerNumber = newCustomer.rows[0].customer_number;
-    console.log('Created Customer:', newCustomer.rows[0]);
-
-    const queries = [];
-
+    console.log('Inserting phone...');
     if (phone) {
-      const phoneQuery = client.query(
-        'INSERT INTO PhoneNumber (phone, customer_number) VALUES ($1, $2) RETURNING *',
-        [phone, customerNumber]
+      await client.query(
+        'INSERT INTO PhoneNumber (phone, customer_number) VALUES ($1, $2)',
+        [phone, newCustomer.rows[0].customer_number]
       );
-      queries.push(phoneQuery);
     }
 
+    console.log('Inserting line...');
     if (line) {
-      const lineQuery = client.query(
-        'INSERT INTO LineNumber (line, customer_number) VALUES ($1, $2) RETURNING *',
-        [line, customerNumber]
+      await client.query(
+        'INSERT INTO LineNumber (line, customer_number) VALUES ($1, $2)',
+        [line, newCustomer.rows[0].customer_number]
       );
-      queries.push(lineQuery);
     }
-
-    const results = await Promise.allSettled(queries);
-
-    console.log('Phone/Line Insert Results:', results);
-
-    const phoneNumberResult = results.find(
-      (result) =>
-        result.status === 'fulfilled' &&
-        result.value.command === 'INSERT' &&
-        result.value.rows[0] &&
-        result.value.rows[0].phone
-    );
-    const lineNumberResult = results.find(
-      (result) =>
-        result.status === 'fulfilled' &&
-        result.value.command === 'INSERT' &&
-        result.value.rows[0] &&
-        result.value.rows[0].line
-    );
 
     await client.query('COMMIT');
-
-    return {
-      customer: newCustomer.rows[0],
-      phone: phoneNumberResult ? phoneNumberResult.value.rows[0] : null,
-      line: lineNumberResult ? lineNumberResult.value.rows[0] : null,
-    };
+    console.log('Transaction committed successfully');
+    return newCustomer.rows[0];
   } catch (err) {
     await client.query('ROLLBACK');
-    console.error('Error during transaction:', err);
+    console.error('Transaction rolled back due to error:', err);
     throw err;
   } finally {
     client.release();
   }
 };
+
 
 const updateCustomer = async (
   customerData,
@@ -368,20 +346,22 @@ const updateCustomer = async (
   }
 };
 
-
 const deleteCustomer = async (id) => {
   await pool.query('delete from customers where customer_number = $1', [id]);
 };
 
 const findAllCustomerDataByID = async (id) => {
-  const result = await pool.query(`select * from linenumber l 
+  const result = await pool.query(
+    `select * from linenumber l 
     inner join customers c on l.customer_number = c.customer_number 
     inner join phonenumber p on c.customer_number = p.customer_number 
     inner join address a on c.address_id = a.address_id 
     inner join city c2 on a.city_id = c2.city_id 
     inner join state s on c2.state_id = s.state_id
     inner join gender g on c.gender_id = g.gender_id
-    where c.customer_number = $1`, [id]);
+    where c.customer_number = $1`,
+    [id]
+  );
   return result.rows[0];
 };
 

@@ -31,7 +31,7 @@ exports.getCustomerByID = async (req, res) => {
 };
 
 exports.postCustomer = async (req, res) => {
-  const { gender, state, city, address, postal_code, phone, line } = req.body;
+  const { gender, state, city, address, postalCode, phone, line } = req.body;
 
   try {
     const newCustomer = await createCustomer(
@@ -40,7 +40,7 @@ exports.postCustomer = async (req, res) => {
       state,
       city,
       address,
-      postal_code,
+      postalCode,
       phone,
       line
     );

@@ -430,7 +430,9 @@ function Customers({ isUpdate }) {
           onChange={(event) => setLineNumber(event.target.value)}
           className="block w-full p-[8px] box-border border-[1px] border-gray-500 rounded-md text-[12px] bg-white"
         />
-        {serverError && <div className="text-sm text-red-700">{serverError}</div>}
+        {serverError && (
+          <div className="text-sm text-red-700">{serverError}</div>
+        )}
         <button
           type="submit"
           className="my-3 bg-[#483285] w-full rounded-md py-2 mt-8 text-center text-white hover:bg-[#342461] transition-all"
