@@ -17,10 +17,15 @@ function CustomerData() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
     const fetchData = async () => {
       try {
         const response = await fetch('http://localhost:3000/customer', {
-          method: 'GET'
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token,
+          },
         });
         const result = await response.json();
         console.log('API Response:', result);
@@ -61,8 +66,13 @@ function CustomerData() {
   
     if (window.confirm('Are you sure to delete this customer?')) {
       try {
+        const token = localStorage.getItem('token');
         const response = await fetch(`http://localhost:3000/customer/${id}`, {
           method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token,
+          },
         });
         if (!response.ok) throw new Error('Failed to delete customer');
         alert('Customer deleted successfully');

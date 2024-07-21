@@ -1,18 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
 import { SidebarData } from './SidebarData';
-import SearchIcon from '@mui/icons-material/Search';
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
-import { Button, InputBase } from '@mui/material';
+import { Button } from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
-import { styled } from '@mui/material';
 
-const SearchInput = styled(InputBase)(({ theme }) => ({
-  color: '#ffffff',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1),
-  },
-}));
 
 function Sidebar() {
   const location = useLocation();

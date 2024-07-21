@@ -11,7 +11,14 @@ function RepresentativeDetails() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/representative/${id}`);
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:3000/representative/${id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token,
+          },
+        });
         if (!response.ok) throw new Error('Failed to fetch data');
         const result = await response.json();
         setData(result);

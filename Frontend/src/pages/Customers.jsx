@@ -33,7 +33,14 @@ function Customers({ isUpdate }) {
 
   useEffect(() => {
     if (isUpdate && id) {
-      fetch(`http://localhost:3000/customer/${id}`)
+      const token = localStorage.getItem('token');
+      fetch(`http://localhost:3000/customer/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+        },
+      })
         .then((response) => response.json())
         .then((data) => {
           setFirstName(data.first_name);
@@ -87,13 +94,17 @@ function Customers({ isUpdate }) {
       line: lineNumber,
     };
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(
         isUpdate
           ? `http://localhost:3000/customer/edit/${id}`
           : 'http://localhost:3000/customer',
         {
           method: isUpdate ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token,
+          },
           body: JSON.stringify(values),
         }
       );

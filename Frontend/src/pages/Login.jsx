@@ -41,6 +41,7 @@ function Login() {
           setSubmitting(false);
           return;
         }
+        localStorage.setItem('token', data.token);
         navigate('/');
       } catch (err) {
         console.error('Error:', err);

@@ -19,8 +19,13 @@ function RepresentativeData() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem('token');
         const response = await fetch('http://localhost:3000/representative', {
           method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token,
+          },
         });
         const result = await response.json();
         const sortedData = result.data
@@ -49,10 +54,15 @@ function RepresentativeData() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure to delete this representative?')) {
       try {
+        const token = localStorage.getItem('token');
         const response = await fetch(
           `http://localhost:3000/representative/${id}`,
           {
             method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-auth-token': token,
+            },
           }
         );
         if (!response.ok) throw new Error('Failed to delete representative');

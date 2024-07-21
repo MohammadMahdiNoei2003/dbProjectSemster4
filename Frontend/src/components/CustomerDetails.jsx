@@ -1,53 +1,90 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom"
-import { Card, CardContent, Typography, Box, Button, CircularProgress } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  Button,
+  CircularProgress,
+} from '@mui/material';
 
 function CustomerDetails() {
   const navigate = useNavigate();
-    const {id} = useParams();
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+  const { id } = useParams();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-              const response = await fetch(`http://localhost:3000/customer/${id}`);
-              if (!response.ok) throw new Error('Failed to fetch data');
-              const result = await response.json();
-              setData(result);
-            } catch (err) {
-              setError('Error fetching details');
-              console.error(err);
-            } finally {
-              setLoading(false);
-            }
-          };
-      
-          fetchData();
-    }, [id]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:3000/customer/${id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token,
+          },
+        });
+        if (!response.ok) throw new Error('Failed to fetch data');
+        const result = await response.json();
+        setData(result);
+      } catch (err) {
+        setError('Error fetching details');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (loading) {
-        return (
-          <Box display="flex" justifyContent="center" alignItems="center" height="120vh">
-            <CircularProgress />
-          </Box>
-        );
-      }
-    
-      if (error) {
-        return (
-          <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-            <Typography color="error">{error}</Typography>
-          </Box>
-        );
-      }
+    fetchData();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="120vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
 
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" height="100vh" className="my-8 mb-8">
-      <Card sx={{ maxWidth: 600, boxShadow: 3, marginTop: 15, marginBottom: 15 }}>
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="100vh"
+      className="my-8 mb-8"
+    >
+      <Card
+        sx={{ maxWidth: 600, boxShadow: 3, marginTop: 15, marginBottom: 15 }}
+      >
         <CardContent>
-          <Typography variant="h5" component="div" gutterBottom style={{fontWeight: 'bold', textAlign: "center"}}>
+          <Typography
+            variant="h5"
+            component="div"
+            gutterBottom
+            style={{ fontWeight: 'bold', textAlign: 'center' }}
+          >
             Customer Details
           </Typography>
           <Typography variant="h6" component="div" gutterBottom>
@@ -104,18 +141,28 @@ function CustomerDetails() {
           <Typography variant="h6" component="div" gutterBottom>
             Line: {data.line}
           </Typography>
-          <Box mt={2} textAlign={"center"}>
-            <Button variant="contained" color="primary" onClick={() => window.history.back()} className="rounded-r-none">
+          <Box mt={2} textAlign={'center'}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => window.history.back()}
+              className="rounded-r-none"
+            >
               Go Back
             </Button>
-            <Button variant="contained" color="secondary" onClick={() => navigate('/product/show')} className="rounded-l-none">
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => navigate('/product/show')}
+              className="rounded-l-none"
+            >
               Products
             </Button>
           </Box>
         </CardContent>
       </Card>
     </Box>
-  )
+  );
 }
 
-export default CustomerDetails
+export default CustomerDetails;

@@ -14,7 +14,14 @@ function Contract({ isUpdate }) {
 
   useEffect(() => {
     if (isUpdate && id) {
-      fetch(`http://localhost:3000/contract/${id}`)
+      const token = localStorage.getItem('token');
+      fetch(`http://localhost:3000/contract/${id}`, {
+        method: "GET",
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token,
+          },
+      })
         .then(response => response.json())
         .then(data => {
           setSubscriptionCode(data.shuttle_subscription_code);
@@ -37,10 +44,12 @@ function Contract({ isUpdate }) {
     };
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:3000/contract', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-auth-token': token,
         },
         body: JSON.stringify(values),
       });
@@ -71,10 +80,12 @@ function Contract({ isUpdate }) {
     };
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:3000/contract/edit/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'x-auth-token': token,
         },
         body: JSON.stringify(values),
       });

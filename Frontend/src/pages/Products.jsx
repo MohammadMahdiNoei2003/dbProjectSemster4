@@ -23,9 +23,16 @@ function Products({ isUpdate }) {
     }
 
     if (isUpdate && id) {
-      fetch(`http://localhost:3000/product/${id}`)
-        .then(response => response.json())
-        .then(data => {
+      const token = localStorage.getItem('token');
+      fetch(`http://localhost:3000/product/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
           console.log('Fetched data:', data); // افزودن لاگ برای بررسی داده‌ها
           setSimCardSerialNumber(data.sim_card_serial_number || '');
           setModemSerialNumber(data.modem_serial_number || '');
@@ -34,7 +41,7 @@ function Products({ isUpdate }) {
           setService(data.service || '');
           setCustomerNumber(data.customer_number || '');
         })
-        .catch(error => console.error('Error fetching product data:', error));
+        .catch((error) => console.error('Error fetching product data:', error));
     }
   }, [isUpdate, id]);
 
@@ -51,10 +58,12 @@ function Products({ isUpdate }) {
     };
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:3000/product', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-auth-token': token,
         },
         body: JSON.stringify(values),
       });
@@ -66,7 +75,7 @@ function Products({ isUpdate }) {
       } else {
         const data = await response.json();
         console.log('Registration response:', data);
-        navigate("/product/show");
+        navigate('/product/show');
       }
     } catch (err) {
       console.error('Error:', err);
@@ -88,10 +97,12 @@ function Products({ isUpdate }) {
     };
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:3000/product/edit/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'x-auth-token': token,
         },
         body: JSON.stringify(values),
       });
@@ -101,7 +112,7 @@ function Products({ isUpdate }) {
         setServerError(data.message || 'Failed to update.');
       } else {
         console.log('Update response:', data);
-        navigate("/product/show");
+        navigate('/product/show');
       }
     } catch (err) {
       console.error('Error updating:', err);
@@ -111,7 +122,9 @@ function Products({ isUpdate }) {
 
   return (
     <div className="container border rounded-md px-10 py-2 w-[500px] text-center m-auto my-8">
-      <h1 className="text-xl text-center">{isUpdate ? 'Update Product' : 'Product Form'}</h1>
+      <h1 className="text-xl text-center">
+        {isUpdate ? 'Update Product' : 'Product Form'}
+      </h1>
       <form onSubmit={isUpdate ? handleUpdate : handleSubmit}>
         <label
           htmlFor="customerNumber"
@@ -198,7 +211,7 @@ function Products({ isUpdate }) {
           checked={service === 'postpaid'}
           onChange={(event) => setService(event.target.value)}
         />{' '}
-        Postpaid 
+        Postpaid
         <input
           type="radio"
           name="service"
@@ -208,7 +221,9 @@ function Products({ isUpdate }) {
           onChange={(event) => setService(event.target.value)}
         />{' '}
         Prepaid
-        {serverError && <div className="text-sm text-red-700">{serverError}</div>}
+        {serverError && (
+          <div className="text-sm text-red-700">{serverError}</div>
+        )}
         <button
           type="submit"
           className="my-3 bg-[#483285] w-full rounded-md py-2 mt-8 text-center text-white hover:bg-[#342461] transition-all"

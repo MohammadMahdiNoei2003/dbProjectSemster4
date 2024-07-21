@@ -19,8 +19,13 @@ function ContractData() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem('token');
         const response = await fetch('http://localhost:3000/contract', {
           method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token,
+          },
         });
         const result = await response.json();
         const sortedData = result.data
@@ -52,15 +57,17 @@ function ContractData() {
       alert('Invalid contract ID');
       return;
     }
-  
+
     if (window.confirm('Are you sure to delete this contract?')) {
       try {
-        const response = await fetch(
-          `http://localhost:3000/contract/${id}`,
-          {
-            method: 'DELETE',
-          }
-        );
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:3000/contract/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token,
+          },
+        });
         if (!response.ok) throw new Error('Failed to delete contract');
         alert('Contract deleted successfully');
         const updatedData = data.filter((item) => item.contract_number !== id);
@@ -72,7 +79,6 @@ function ContractData() {
       }
     }
   };
-  
 
   return (
     <TableContainer
