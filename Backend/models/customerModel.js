@@ -1,7 +1,13 @@
 const pool = require('../database/db');
 
 const findAllCustomers = async () => {
-  const result = await pool.query('select * from customers c1 inner join address a on c1.address_id = a.address_id inner join city c2 on a.city_id = c2.city_id inner join state s on c2.state_id = s.state_id;');
+  const result = await pool.query(`select * from linenumber l 
+    inner join customers c on l.customer_number = c.customer_number 
+    inner join phonenumber p on c.customer_number = p.customer_number 
+    inner join address a on c.address_id = a.address_id 
+    inner join city c2 on a.city_id = c2.city_id 
+    inner join state s on c2.state_id = s.state_id
+    inner join gender g on c.gender_id = g.gender_id`);
   return result.rows;
 };
 
@@ -151,8 +157,20 @@ const createCustomer = async (
 
     console.log('Phone/Line Insert Results:', results);
 
-    const phoneNumberResult = results.find(result => result.status === 'fulfilled' && result.value.command === 'INSERT' && result.value.rows[0] && result.value.rows[0].phone);
-    const lineNumberResult = results.find(result => result.status === 'fulfilled' && result.value.command === 'INSERT' && result.value.rows[0] && result.value.rows[0].line);
+    const phoneNumberResult = results.find(
+      (result) =>
+        result.status === 'fulfilled' &&
+        result.value.command === 'INSERT' &&
+        result.value.rows[0] &&
+        result.value.rows[0].phone
+    );
+    const lineNumberResult = results.find(
+      (result) =>
+        result.status === 'fulfilled' &&
+        result.value.command === 'INSERT' &&
+        result.value.rows[0] &&
+        result.value.rows[0].line
+    );
 
     await client.query('COMMIT');
 
@@ -169,8 +187,6 @@ const createCustomer = async (
     client.release();
   }
 };
-
-
 
 const updateCustomer = async (
   customerData,
@@ -258,7 +274,7 @@ const updateCustomer = async (
     let addressId;
     if (addressResult.rows.length === 0) {
       const newAddress = await client.query(
-        'INSERT INTO Address (address, postal_code, city_id) VALUES ($1, $2, $3) RETURNING address_id',
+        'UPDATE Address set address = $1, postal_code = $2, city_id = $3 RETURNING address_id',
         [address, postalCode, cityId]
       );
       addressId = newAddress.rows[0].address_id;
@@ -270,7 +286,7 @@ const updateCustomer = async (
       `UPDATE customers SET
         first_name = $1, last_name = $2, job_title = $3, father_name = $4, nationality = $5, education_grade = $6, 
         national_number = $7, presenter_number = $8, national_code = $9, passport_number = $10, dob = $11, email = $12, 
-        gender_id = $13, address_id = $14 WHERE customer_id = $15 RETURNING *`,
+        gender_id = $13, address_id = $14 WHERE customer_number = $15 RETURNING *`,
       [
         first_name,
         last_name,
@@ -286,7 +302,7 @@ const updateCustomer = async (
         email,
         genderId,
         addressId,
-        customerId
+        customerId,
       ]
     );
 
@@ -315,8 +331,20 @@ const updateCustomer = async (
 
     console.log('Phone/Line Update Results:', results);
 
-    const phoneNumberResult = results.find(result => result.status === 'fulfilled' && result.value.command === 'UPDATE' && result.value.rows[0] && result.value.rows[0].phone);
-    const lineNumberResult = results.find(result => result.status === 'fulfilled' && result.value.command === 'UPDATE' && result.value.rows[0] && result.value.rows[0].line);
+    const phoneNumberResult = results.find(
+      (result) =>
+        result.status === 'fulfilled' &&
+        result.value.command === 'UPDATE' &&
+        result.value.rows[0] &&
+        result.value.rows[0].phone
+    );
+    const lineNumberResult = results.find(
+      (result) =>
+        result.status === 'fulfilled' &&
+        result.value.command === 'UPDATE' &&
+        result.value.rows[0] &&
+        result.value.rows[0].line
+    );
 
     await client.query('COMMIT');
 
@@ -334,11 +362,20 @@ const updateCustomer = async (
   }
 };
 
-module.exports = { createCustomer, updateCustomer };
-
-
 const deleteCustomer = async (id) => {
   await pool.query('delete from customers where customer_number = $1', [id]);
+};
+
+const findAllCustomerDataByID = async (id) => {
+  const result = await pool.query(`select * from linenumber l 
+    inner join customers c on l.customer_number = c.customer_number 
+    inner join phonenumber p on c.customer_number = p.customer_number 
+    inner join address a on c.address_id = a.address_id 
+    inner join city c2 on a.city_id = c2.city_id 
+    inner join state s on c2.state_id = s.state_id
+    inner join gender g on c.gender_id = g.gender_id
+    where c.customer_number = $1`, [id]);
+  return result.rows[0];
 };
 
 module.exports = {
@@ -347,4 +384,5 @@ module.exports = {
   createCustomer,
   updateCustomer,
   deleteCustomer,
+  findAllCustomerDataByID,
 };

@@ -12,6 +12,9 @@ import CustomerData from './components/CustomerData';
 import RepresentativeData from './components/RepresentativeData';
 import RepresentativeDetails from './components/RepresentativeDetails';
 import ContractData from './components/ContractData';
+import CustomerDetails from './components/CustomerDetails';
+import Products from './pages/Products';
+import ProductData from './components/ProductData.jsx';
 
 function App() {
   return (
@@ -34,6 +37,10 @@ function App() {
             <Route path='/representative/show' element={<RepresentativeData />} />
             <Route path='/representative/:id' element={<RepresentativeDetails />} />
             <Route path='/contract/show' element={<ContractData />} />
+            <Route path='/customer/:id' element={<CustomerDetails />} />
+            <Route path='/product' element={<Products isUpdate={false} />} />
+            <Route path='/product/edit/:id' element={<Products isUpdate={true} />} />
+            <Route path='/product/show' element={<ProductData />} />
           </Routes>
         </div>
       </div>

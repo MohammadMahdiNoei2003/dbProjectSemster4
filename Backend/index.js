@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const customerRoutes = require('./routes/customerRoute');
 const repRouter = require('./routes/repRoute');
 const contractRouter = require('./routes/contractRouter');
+const productRouter = require('./routes/productRoute');
 
 const PORT = process.env.PORT || 3000;
 
@@ -22,6 +23,7 @@ app.use('/auth', authRoutes);
 app.use('/customer', customerRoutes);
 app.use('/representative', repRouter);
 app.use('/contract', contractRouter);
+app.use('/product', productRouter);
 
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}`);

@@ -1,7 +1,7 @@
 const pool = require('../database/db');
 
 const findAllContracts = async () => {
-  const result = await pool.query('select * from contract');
+  const result = await pool.query('select * from customers c join contract c2 on c.customer_number = c2.customer_number join representative r on c2.rep_number = r.rep_number join requesttype r2 ON c2.req_id = r2.req_id');
   return result.rows;
 };
 

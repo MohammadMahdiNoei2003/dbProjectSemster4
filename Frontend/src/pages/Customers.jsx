@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 function Customers({ isUpdate }) {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [serverError, setServerError] = useState('');
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -47,10 +48,10 @@ function Customers({ isUpdate }) {
           setPassportNumber(data.passport_number);
           setDateOfBirth(dayjs(data.dob));
           setEmail(data.email);
-          setGender(data.gender);
+          setGender(data.gender_title);
           setAddress(data.address);
-          setState(data.state);
-          setCity(data.city);
+          setState(data.state_name);
+          setCity(data.city_name);
           setPostalCode(data.postal_code);
           setPhoneNumber(data.phone);
           setLineNumber(data.line);
@@ -93,17 +94,25 @@ function Customers({ isUpdate }) {
         },
         body: JSON.stringify(values),
       });
-      const data = await response.json();
-      console.log('Registration response: ', data);
+      if (!response.ok) {
+        const data = await response.json();
+        console.error('Server error:', data);
+        setServerError(data.message || 'Failed to submit.');
+      } else {
+        const data = await response.json();
+        console.log('Registration response:', data);
+        navigate("/customer/show");
+      }
     } catch (err) {
-      console.error('Error registering: ', err);
-      return navigate('/500');
+      console.error('Error:', err);
+      setServerError('Internal server error.');
+      navigate('/500');
     }
   };
 
   const handleUpdate = async (event) => {
     event.preventDefault();
-
+  
     const values = {
       first_name: firstName,
       last_name: lastName,
@@ -125,22 +134,33 @@ function Customers({ isUpdate }) {
       phone: phoneNumber,
       line: lineNumber,
     };
-
+  
+    console.log('Values before sending:', values);
+  
     try {
-      const response = await fetch(`http://localhost:3000/customer/${id}`, {
+      const response = await fetch(`http://localhost:3000/customer/edit/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(values),
       });
-      const data = await response.json();
-      console.log('Update response: ', data);
+      if (!response.ok) {
+        const data = await response.json();
+        console.error('Server error:', data);
+        setServerError(data.message || 'Failed to submit.');
+      } else {
+        const data = await response.json();
+        console.log('Registration response:', data);
+        navigate("/customer/show");
+      }
     } catch (err) {
-      console.error('Error updating: ', err);
-      return navigate('/500');
+      console.error('Error:', err);
+      setServerError('Internal server error.');
+      navigate('/500');
     }
   };
+  
 
   return (
     <div className="container border rounded-md px-10 py-2 w-[500px] text-center m-auto my-8">
@@ -214,6 +234,7 @@ function Customers({ isUpdate }) {
           name="national_number"
           value={nationalNumber}
           required
+          // readOnly={isUpdate}
           onChange={(event) => setNationalNumber(event.target.value)}
           className="block w-full p-[8px] box-border border-[1px] border-gray-500 rounded-md text-[12px] bg-white"
         />
@@ -228,6 +249,7 @@ function Customers({ isUpdate }) {
           name="national_code"
           value={nationalCode}
           required
+          // readOnly={isUpdate}
           onChange={(event) => setNationalCode(event.target.value)}
           className="block w-full p-[8px] box-border border-[1px] border-gray-500 rounded-md text-[12px] bg-white"
         />
@@ -276,6 +298,7 @@ function Customers({ isUpdate }) {
           type="text"
           name="passport_number"
           value={passportNumber}
+          // readOnly={isUpdate}
           onChange={(event) => setPassportNumber(event.target.value)}
           className="block w-full p-[8px] box-border border-[1px] border-gray-500 rounded-md text-[12px] bg-white"
         />
@@ -455,6 +478,7 @@ function Customers({ isUpdate }) {
           onChange={(event) => setLineNumber(event.target.value)}
           className="block w-full p-[8px] box-border border-[1px] border-gray-500 rounded-md text-[12px] bg-white"
         />
+        {serverError && <div className="text-sm text-red-700">{serverError}</div>}
         <button
           type="submit"
           className="my-3 bg-[#483285] w-full rounded-md py-2 mt-8 text-center text-white hover:bg-[#342461] transition-all"
