@@ -13,7 +13,13 @@ const findAllCustomers = async () => {
 
 const findCustomerByID = async (id) => {
   const result = await pool.query(
-    'select * from customers where customer_number = $1',
+    `select * from linenumber l 
+    inner join customers c on l.customer_number = c.customer_number 
+    inner join phonenumber p on c.customer_number = p.customer_number 
+    inner join address a on c.address_id = a.address_id 
+    inner join city c2 on a.city_id = c2.city_id 
+    inner join state s on c2.state_id = s.state_id
+    inner join gender g on c.gender_id = g.gender_id where customer_number = $1`,
     [id]
   );
   return result.rows[0];
@@ -274,7 +280,7 @@ const updateCustomer = async (
     let addressId;
     if (addressResult.rows.length === 0) {
       const newAddress = await client.query(
-        'UPDATE Address set address = $1, postal_code = $2, city_id = $3 RETURNING address_id',
+        'INSERT INTO Address (address, postal_code, city_id) VALUES ($1, $2, $3) RETURNING address_id',
         [address, postalCode, cityId]
       );
       addressId = newAddress.rows[0].address_id;
@@ -361,6 +367,7 @@ const updateCustomer = async (
     client.release();
   }
 };
+
 
 const deleteCustomer = async (id) => {
   await pool.query('delete from customers where customer_number = $1', [id]);

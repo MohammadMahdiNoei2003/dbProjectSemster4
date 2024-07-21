@@ -76,98 +76,48 @@ function Customers({ isUpdate }) {
       presenter_number: presenterNumber,
       national_code: nationalCode,
       passport_number: passportNumber,
-      dob: dateOfBirth.format('YYYY-MM-DD'),
+      dob: dateOfBirth,
       email: email,
       gender: gender,
       address: address,
       state: state,
       city: city,
-      postal_code: postalCode,
+      postalCode: postalCode,
       phone: phoneNumber,
       line: lineNumber,
     };
     try {
-      const response = await fetch('http://localhost:3000/customer', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        console.error('Server error:', data);
-        setServerError(data.message || 'Failed to submit.');
-      } else {
-        const data = await response.json();
-        console.log('Registration response:', data);
-        navigate("/customer/show");
-      }
-    } catch (err) {
-      console.error('Error:', err);
-      setServerError('Internal server error.');
-      navigate('/500');
-    }
-  };
+      const response = await fetch(
+        isUpdate
+          ? `http://localhost:3000/customer/edit/${id}`
+          : 'http://localhost:3000/customer',
+        {
+          method: isUpdate ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(values),
+        }
+      );
 
-  const handleUpdate = async (event) => {
-    event.preventDefault();
-  
-    const values = {
-      first_name: firstName,
-      last_name: lastName,
-      job_title: jobTitle,
-      father_name: fatherName,
-      nationality: nationality,
-      education_grade: educationGrade,
-      national_number: nationalNumber,
-      presenter_number: presenterNumber,
-      national_code: nationalCode,
-      passport_number: passportNumber,
-      dob: dateOfBirth.format('YYYY-MM-DD'),
-      email: email,
-      gender: gender,
-      address: address,
-      state: state,
-      city: city,
-      postal_code: postalCode,
-      phone: phoneNumber,
-      line: lineNumber,
-    };
-  
-    console.log('Values before sending:', values);
-  
-    try {
-      const response = await fetch(`http://localhost:3000/customer/edit/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        console.error('Server error:', data);
-        setServerError(data.message || 'Failed to submit.');
+      const data = await response.json();
+
+      if (response.ok) {
+        navigate(`/customer/show`);
       } else {
-        const data = await response.json();
-        console.log('Registration response:', data);
-        navigate("/customer/show");
+        setServerError(data.error);
       }
-    } catch (err) {
-      console.error('Error:', err);
-      setServerError('Internal server error.');
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setServerError('An unexpected error occurred. Please try again.');
       navigate('/500');
     }
   };
-  
 
   return (
     <div className="container border rounded-md px-10 py-2 w-[500px] text-center m-auto my-8">
       <h1 className="text-xl text-center">
         {isUpdate ? 'Update Customer' : 'Customer Form'}
       </h1>
-      <form onSubmit={isUpdate ? handleUpdate : handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <label
           htmlFor="firstName"
           className="text-[15px] block w-full mt-[8px] mb-[5px] text-left font-bold"
@@ -263,6 +213,7 @@ function Customers({ isUpdate }) {
           type="radio"
           name="gender"
           value="male"
+          checked={gender === 'male'}
           className="inline w-[10%]"
           onChange={(event) => setGender(event.target.value)}
         />{' '}
@@ -271,6 +222,7 @@ function Customers({ isUpdate }) {
           type="radio"
           name="gender"
           value="female"
+          checked={gender === 'female'}
           className="inline w-[10%]"
           onChange={(event) => setGender(event.target.value)}
         />{' '}
