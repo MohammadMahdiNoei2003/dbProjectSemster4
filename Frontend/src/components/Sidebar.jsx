@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { SidebarData } from './SidebarData';
 import SearchIcon from '@mui/icons-material/Search';
+import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import { Button, InputBase } from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
@@ -18,13 +19,14 @@ function Sidebar() {
   return (
     <div className="h-screen w-[300px] bg-[#483285] flex flex-col fixed">
       <div className="flex flex-row justify-center items-center my-4 mr-2">
-        <div className="flex items-center w-[250px] text-white">
-          <SearchIcon className="mr-2" />
-          <SearchInput
+        <div className="flex items-center w-[250px] text-white text-3xl">
+          {/* <SearchIcon className="mr-2" /> */}
+          <ImportContactsIcon className='mr-2' />
+          {/* <SearchInput
             placeholder="Search"
             inputProps={{ 'aria-label': 'search' }}
             className="ml-1"
-          />
+          /> */}
         </div>
       </div>
       <ul className="h-auto w-full p-0 flex-grow flex flex-col">

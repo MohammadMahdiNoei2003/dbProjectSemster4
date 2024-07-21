@@ -22,6 +22,7 @@ exports.getAllContracts = async (req, res) => {
 exports.getContractByID = async (req, res) => {
   try {
     const contract = await findContractWithRequestTypeByID(req.params.id);
+    console.log(contract);
     if (!contract) {
       return res.status(404).json({ message: 'Contract not found' });
     }

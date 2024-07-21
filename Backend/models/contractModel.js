@@ -1,16 +1,45 @@
 const pool = require('../database/db');
 
 const findAllContracts = async () => {
-  const result = await pool.query('select * from customers c join contract c2 on c.customer_number = c2.customer_number join representative r on c2.rep_number = r.rep_number join requesttype r2 ON c2.req_id = r2.req_id');
+  const result = await pool.query(`select 
+	c.first_name , c.last_name , c.national_number , c.national_code , c.presenter_number , c.email , a.address , a.postal_code , c2.city_name ,
+	s.state_name , p.phone , l.line , r.first_name , r.last_name , r.repersenting_code , c3.*
+	from customers c 
+	join address a on c.address_id = a.address_id 
+	join city c2 on a.city_id = c2.city_id 
+	join state s on c2.state_id = s.state_id 
+	join phonenumber p on c.customer_number = p.customer_number 
+	join linenumber l on c.customer_number = l.customer_number
+	join contract c3 on c.customer_number = c3.customer_number 
+	join representative r on c3.rep_number = r.rep_number 
+	join requesttype r2 on c3.req_id = r2.req_id`);
   return result.rows;
 };
 
 const findContractByID = async (id) => {
   const result = await pool.query(
-    'select * from contract where contract_number = $1',
+    `SELECT 
+      c.first_name, c.last_name, c.national_number, c.national_code, c.presenter_number, c.email,
+      a.address, a.postal_code, c2.city_name,
+      s.state_name, p.phone, l.line,
+      r.first_name AS rep_first_name, r.last_name AS rep_last_name, r.repersenting_code,
+      c3.*
+    FROM 
+      customers c
+      JOIN address a ON c.address_id = a.address_id
+      JOIN city c2 ON a.city_id = c2.city_id
+      JOIN state s ON c2.state_id = s.state_id
+      JOIN phonenumber p ON c.customer_number = p.customer_number
+      JOIN linenumber l ON c.customer_number = l.customer_number
+      JOIN contract c3 ON c.customer_number = c3.customer_number
+      JOIN representative r ON c3.rep_number = r.rep_number
+      JOIN requesttype r2 ON c3.req_id = r2.req_id
+    WHERE 
+      c3.contract_number = $1`,
     [id]
   );
-  return result.rows[0];
+
+  return result.rows;
 };
 
 const createContract = async (contractData, requestType) => {
@@ -55,7 +84,6 @@ const createContract = async (contractData, requestType) => {
     client.release();
   }
 };
-
 
 const updateContract = async (id, contractData, requestType) => {
   const { subscription_code, customer_number, rep_number } = contractData;
@@ -104,10 +132,12 @@ const updateContract = async (id, contractData, requestType) => {
   }
 };
 
-
 const deleteContract = async (id) => {
   try {
-    const result = await pool.query('DELETE FROM Contract WHERE contract_number = $1', [id]);
+    const result = await pool.query(
+      'DELETE FROM Contract WHERE contract_number = $1',
+      [id]
+    );
     if (result.rowCount === 0) {
       throw new Error('Contract not found');
     }
@@ -116,7 +146,6 @@ const deleteContract = async (id) => {
     throw err;
   }
 };
-
 
 const totalCount = async () => {
   const result = await pool.query('SELECT COUNT(*) AS count FROM Contract');
@@ -149,19 +178,24 @@ const findContractWithRequestTypeByID = async (id) => {
   try {
     const result = await pool.query(
       `
-        SELECT
-          c.contract_number,
-          c.shuttle_subscription_code,
-          c.submit_date,
-          c.customer_number,
-          c.rep_number,
-          r.request AS request
-        FROM
-          Contract c
-        inner JOIN
-          RequestType r ON c.req_id = r.req_id
-        WHERE 
-          contract_number = $1
+      SELECT 
+      c.customer_number, c.first_name, c.last_name, c.national_number, c.national_code, c.presenter_number, c.email,
+      a.address, a.postal_code, c2.city_name,
+      s.state_name, p.phone, l.line,
+      r.rep_number, r.first_name AS rep_first_name, r.last_name AS rep_last_name, r.repersenting_code, r2.request,
+      c3.*
+    FROM 
+      customers c
+      JOIN address a ON c.address_id = a.address_id
+      JOIN city c2 ON a.city_id = c2.city_id
+      JOIN state s ON c2.state_id = s.state_id
+      JOIN phonenumber p ON c.customer_number = p.customer_number
+      JOIN linenumber l ON c.customer_number = l.customer_number
+      JOIN contract c3 ON c.customer_number = c3.customer_number
+      JOIN representative r ON c3.rep_number = r.rep_number
+      JOIN requesttype r2 ON c3.req_id = r2.req_id
+    WHERE 
+      c3.contract_number = $1
       `,
       [id]
     );
@@ -173,12 +207,12 @@ const findContractWithRequestTypeByID = async (id) => {
 };
 
 module.exports = {
-    findAllContracts,
-    findContractByID,
-    createContract,
-    updateContract,
-    deleteContract,
-    findAllContractsWithRequestType,
-    findContractWithRequestTypeByID,
-    totalCount,
-}
+  findAllContracts,
+  findContractByID,
+  createContract,
+  updateContract,
+  deleteContract,
+  findAllContractsWithRequestType,
+  findContractWithRequestTypeByID,
+  totalCount,
+};

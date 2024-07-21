@@ -202,9 +202,9 @@ function Products({ isUpdate }) {
         <input
           type="radio"
           name="service"
-          value="prepaid"
+          value="Prepaid"
           className="inline w-[10%]"
-          checked={service === 'prepaid'}
+          checked={service === 'Prepaid'}
           onChange={(event) => setService(event.target.value)}
         />{' '}
         Prepaid
